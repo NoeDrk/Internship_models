@@ -1,0 +1,130 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Sep 18 14:15:40 2023
+
+@author: noederijck
+"""
+
+
+import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Activation, Dense
+from tensorflow.keras.optimizers import Adam, SGD
+from sklearn.utils import shuffle
+import numpy as np
+import random
+import matplotlib.pyplot as plt
+
+random.seed(1999)
+words_list = []
+epoch_accuracies = []
+epoch_losses = []
+
+alphabet = {"a": 0,
+            "b": 1,
+            "c": 2,
+            "d": 3,
+            "e": 4,
+            "f": 5,
+            "g": 6,
+            "h": 7,
+            "i": 8,
+            "j": 9,
+            "k": 10,
+            "l": 11,
+            "m": 12,
+            "n": 13,
+            "o": 14,
+            "p": 15,
+            "q": 16,
+            "r": 17,
+            "s": 18,
+            "t": 19,
+            "u": 20,
+            "v": 21,
+            "w": 22,
+            "x": 23,
+            "y": 24,
+            "z": 25}
+
+inputs = []
+targets = []
+
+
+
+#Import fr/en word pairs
+with open("/Users/noederijck/Desktop/word_lists/fr_en_long_word_list.txt", "r") as file:
+    for line in file:
+        word_pair = line.strip().split(",")
+        words_list.append(word_pair)
+                                                      
+# Transforming words to input vector of lenght 26 based on the frequency of each letter in the word
+for words in words_list:
+    en_word = np.zeros(26)
+    fr_word = np.zeros(26)
+    for letter in words[0]:
+        en_word[alphabet[letter]] += 1/len(words[0])
+    for letter in words[1]:
+        fr_word[alphabet[letter]] += 1/len(words[1])
+    targets.append(en_word)
+    inputs.append(fr_word)
+#                                 A,    B,   C,   D,  ...Z
+# Such that the word DAD becomes [0.33, 0.0, 0.0, 0.66...0.0]
+
+# Because 2/3 of the letters in the word "DAD" are "D" and "A" represents 1/3 of the letters
+
+
+# Turns list of list into matrix of arrays
+targets = np.array(targets)
+inputs = np.array(inputs)
+
+#Initializing biases and weights
+weights = np.random.rand(26, 26)
+biases = np.zeros(26)
+
+
+#Model Parameters
+epochs = 200
+learning_rate = 0.01
+
+
+
+for epoch in range(epochs):
+    inputs, targets = shuffle(inputs, targets) 
+    total_loss = 0
+    correct_predictions = 0
+    for n in range(26):
+       for n in range(30):
+        output_activation = np.dot(inputs[n], weights) + biases
+        
+        #Softmax activation function
+        exp_values = np.exp(output_activation)
+        norm_values = exp_values / sum(exp_values)
+        
+        pred_error =  targets[n] - norm_values
+        total_loss += np.sum(abs(pred_error))
+        
+        #Updating Weights and biases 
+        weights += learning_rate * np.outer(inputs[n], pred_error)
+        biases += learning_rate * pred_error
+        
+        #Calculating accuracy (This doesn't work)
+        correct_predictions = np.sum(norm_values == targets[n])
+        accuracy = correct_predictions / 26
+    
+    epoch_accuracy = correct_predictions / 26
+    epoch_loss = total_loss / 26
+    
+    epoch_accuracies.append(epoch_accuracy)
+    epoch_losses.append(epoch_loss)
+
+    print(f"Epoch {epoch + 1}/{epochs} - Loss: {epoch_loss:.2f} - Accuracy: {epoch_accuracy:.0f}")
+
+
+
+
+plt.plot(range(1, epochs + 1), epoch_losses, color='black')
+
+
+
