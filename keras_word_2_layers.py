@@ -20,7 +20,7 @@ words_list = []
 inputs = []
 
 #Importing word list
-with open("/Users/noederijck/Desktop/word_lists/fr_en_short_word_list.txt", "r") as file:
+with open("fr_en_short_word_list.txt", "r") as file:
     for line in file:
         word_pair = line.strip().split(",")
         words_list.append(word_pair)
