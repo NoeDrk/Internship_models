@@ -84,7 +84,7 @@ en_train = tf.stack(np.array(en_train))
 fr_labels = tf.stack(np.array(fr_labels))
 
 #Model Parameters
-optimizer = Adam(learning_rate=0.001)
+optimizer = Adam(learning_rate=0.00001)
 
 #Model Structure
 model = Sequential([Dense(units=50, input_shape=(26,), activation='relu')])
@@ -94,11 +94,12 @@ history = model.fit(x=en_train, validation_split=0.1, y=fr_labels, batch_size=30
 
 
 #loss = history.history['loss']
-#accuracy = history.history['accuracy']
+accuracy = history.history['accuracy']
+plt.plot(accuracy, color="black")
 #plt.scatter(loss, accuracy, marker='o', c='black')
 #plt.title('Accuracy vs. Loss')
 
-plt.plot(history.history["loss"], color = "black")
+#plt.plot(history.history["loss"], color = "black")
 #plt.xlabel('Epoch')
 #plt.ylabel('Accuracy')    
 #plt.show()
